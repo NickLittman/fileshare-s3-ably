@@ -1,4 +1,5 @@
 require('dotenv').config();
+const mime = require('mime-types');
 const { S3Client, PutObjectCommand, GetObjectCommand } = require("@aws-sdk/client-s3");
 const { getSignedUrl } = require("@aws-sdk/s3-request-presigner");
 const Ably = require('ably');
@@ -16,10 +17,13 @@ const s3Client = new S3Client({
 });
 
 const uploadToS3 = async (file, fileName) => {
+  const contentType = mime.contentType(fileName);
   const params = {
     Bucket: process.env.AWS_BUCKET_NAME,
     Key: fileName,
     Body: file,
+    ContentDisposition: 'inline',
+    ContentType: contentType,
   };
 
   try {
